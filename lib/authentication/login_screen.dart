@@ -1,5 +1,11 @@
 import 'package:drivers_app/authentication/signup_screen.dart';
+import 'package:drivers_app/splash_screen/splash.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+import '../global/global.dart';
+import '../widgets/progess_dialog.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -11,6 +17,47 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
+
+  validateForm() {
+    if (!emailController.text.contains('@') ||
+        emailController.text.contains(',') ||
+        emailController.text.contains('..') ||
+        emailController.text.contains('?')) {
+      Fluttertoast.showToast(msg: 'Invalid Email');
+    } else if (passwordController.text.isEmpty) {
+      Fluttertoast.showToast(msg: 'Password must contain least 6 characters');
+    } else {
+      loginDriverNow();
+    }
+  }
+
+  loginDriverNow() async {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext c) {
+          return ProgressDialog(message: 'Processing, please wait');
+        });
+
+    final User? firebaseUser = (await fAuth
+            .signInWithEmailAndPassword(
+                email: emailController.text.trim(),
+                password: passwordController.text.trim())
+            .catchError((msg) {
+      Navigator.pop(context);
+      Fluttertoast.showToast(msg: 'Error: $msg');
+    }))
+        .user;
+    if (firebaseUser != null) {
+      currentFirebaseUser = firebaseUser;
+      Fluttertoast.showToast(msg: 'Login Successful');
+      Navigator.push(
+          context, MaterialPageRoute(builder: (e) => const MySplashScreen()));
+    } else {
+      Navigator.pop(context);
+      Fluttertoast.showToast(msg: 'Error occured during login');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       backgroundColor: MaterialStatePropertyAll(
                           Theme.of(context).primaryColor)),
                   onPressed: () {
+                    validateForm();
                     //Navigator.push(context, MaterialPageRoute(builder: (e)=> CarInfoScreen()));
                   },
                   child: const Text(
@@ -80,8 +128,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   )),
               TextButton(
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (e) => SignupScreen()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (e) => const SignupScreen()));
                   },
                   child: const Text("Don't an account? Login here"))
             ],

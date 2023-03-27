@@ -34,7 +34,7 @@ class _SignupScreenState extends State<SignupScreen> {
         emailTextEditingController.text.contains('?')) {
       Fluttertoast.showToast(msg: 'Invalid Email');
     } else if (passwordTextEditingController.text.length < 4) {
-      Fluttertoast.showToast(msg: 'Password must contain atleast 6 characters');
+      Fluttertoast.showToast(msg: 'Password must contain least 6 characters');
     } else {
       saveDriverInfoNow();
     }
@@ -54,7 +54,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 password: passwordTextEditingController.text.trim())
             .catchError((msg) {
       Navigator.pop(context);
-      Fluttertoast.showToast(msg: 'Error: ' + msg.toString());
+      Fluttertoast.showToast(msg: 'Error: $msg');
     }))
         .user;
     if (firebaseUser != null) {
@@ -195,7 +195,7 @@ class _SignupScreenState extends State<SignupScreen> {
               TextButton(
                   onPressed: () {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (e) => LoginScreen()));
+                        MaterialPageRoute(builder: (e) => const LoginScreen()));
                   },
                   child: const Text('Already have an account? Login here'))
             ],

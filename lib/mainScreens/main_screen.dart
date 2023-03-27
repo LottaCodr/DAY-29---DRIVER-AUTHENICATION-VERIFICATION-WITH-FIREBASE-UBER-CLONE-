@@ -33,7 +33,7 @@ class _MainScreenState extends State<MainScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       body: TabBarView(
-        physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         controller: tabController,
         children: const [
           HomeTabPage(),
@@ -62,7 +62,7 @@ class _MainScreenState extends State<MainScreen>
       ],
       selectedItemColor: Colors.yellowAccent,
         unselectedItemColor: Colors.white54,
-        backgroundColor: Colors.green,
+        backgroundColor: Theme.of(context).primaryColor,
         type: BottomNavigationBarType.fixed,
         selectedLabelStyle: const TextStyle(fontSize: 14),
         showUnselectedLabels: true,
