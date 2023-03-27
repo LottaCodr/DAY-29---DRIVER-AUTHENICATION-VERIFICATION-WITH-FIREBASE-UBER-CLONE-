@@ -1,4 +1,8 @@
+import 'package:drivers_app/global/global.dart';
+import 'package:drivers_app/splash_screen/splash.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class CarInfoScreen extends StatefulWidget {
   const CarInfoScreen({Key? key}) : super(key: key);
@@ -17,6 +21,23 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
   ];
 
   String? selectedCarType;
+
+  saveCarInfo() {
+    Map driverCarInfoMap = {
+      'car_color': carColorController.text.trim(),
+      'car_number': carNumberController.text.trim(),
+      'car_model': carModelController.text.trim(),
+      'car_type': selectedCarType,
+    };
+
+    DatabaseReference driverRef = FirebaseDatabase.instance.ref().child(
+        'drivers');
+    driverRef.child(currentFirebaseUser!.uid).child('car details').set(
+        driverCarInfoMap);
+    
+    Fluttertoast.showToast(msg: 'Congratulations, Car details has been saved!');
+    Navigator.push(context, MaterialPageRoute(builder: (e)=> MySplashScreen()));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,17 +70,21 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
                 decoration: InputDecoration(
                     labelText: 'Car Model',
                     labelStyle:
-                        const TextStyle(color: Colors.black, fontSize: 14),
+                    const TextStyle(color: Colors.black, fontSize: 14),
                     hintText: 'car model',
                     hintStyle:
-                        const TextStyle(color: Colors.grey, fontSize: 10),
+                    const TextStyle(color: Colors.grey, fontSize: 10),
                     enabledBorder: UnderlineInputBorder(
                       borderSide:
-                          BorderSide(color: Theme.of(context).primaryColor),
+                      BorderSide(color: Theme
+                          .of(context)
+                          .primaryColor),
                     ),
                     focusedBorder: UnderlineInputBorder(
                         borderSide:
-                            BorderSide(color: Theme.of(context).primaryColor))),
+                        BorderSide(color: Theme
+                            .of(context)
+                            .primaryColor))),
               ),
 
               TextField(
@@ -69,17 +94,21 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
                 decoration: InputDecoration(
                     labelText: 'Car Number',
                     labelStyle:
-                        const TextStyle(color: Colors.black, fontSize: 14),
+                    const TextStyle(color: Colors.black, fontSize: 14),
                     hintText: '000 000 0000',
                     hintStyle:
-                        const TextStyle(color: Colors.grey, fontSize: 10),
+                    const TextStyle(color: Colors.grey, fontSize: 10),
                     enabledBorder: UnderlineInputBorder(
                       borderSide:
-                          BorderSide(color: Theme.of(context).primaryColor),
+                      BorderSide(color: Theme
+                          .of(context)
+                          .primaryColor),
                     ),
                     focusedBorder: UnderlineInputBorder(
                         borderSide:
-                            BorderSide(color: Theme.of(context).primaryColor))),
+                        BorderSide(color: Theme
+                            .of(context)
+                            .primaryColor))),
               ),
               TextField(
                 style: const TextStyle(color: Colors.black),
@@ -88,55 +117,67 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
                 decoration: InputDecoration(
                     labelText: 'Car Colour',
                     labelStyle:
-                        const TextStyle(color: Colors.black, fontSize: 14),
+                    const TextStyle(color: Colors.black, fontSize: 14),
                     hintText: 'Red Accent',
                     hintStyle:
-                        const TextStyle(color: Colors.grey, fontSize: 10),
+                    const TextStyle(color: Colors.grey, fontSize: 10),
                     enabledBorder: UnderlineInputBorder(
                       borderSide:
-                          BorderSide(color: Theme.of(context).primaryColor),
+                      BorderSide(color: Theme
+                          .of(context)
+                          .primaryColor),
                     ),
                     focusedBorder: UnderlineInputBorder(
                         borderSide:
-                            BorderSide(color: Theme.of(context).primaryColor))),
+                        BorderSide(color: Theme
+                            .of(context)
+                            .primaryColor))),
               ),
-          const SizedBox(height: 5,),
+              const SizedBox(height: 5,),
               DropdownButton(
-                  items: carTypeList.map((car) {
-                    return  DropdownMenuItem(
-                        value: car,
-                        child: Text(car,
-                        style: const TextStyle(
+                items: carTypeList.map((car) {
+                  return DropdownMenuItem(
+                    value: car,
+                    child: Text(car,
+                      style: const TextStyle(
                           color: Colors.black
-                        ),),
+                      ),),
 
-                    );
-
-                  }).toList(),
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedCarType = newValue.toString();
-                    });
-                  },
-                  value: selectedCarType,
+                  );
+                }).toList(),
+                onChanged: (newValue) {
+                  setState(() {
+                    selectedCarType = newValue.toString();
+                  });
+                },
+                value: selectedCarType,
                 hint: const Text('Please choose Car Type',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black
-                ),),
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black
+                  ),),
               ),
 
               ElevatedButton(
                   style: ButtonStyle(
-                      backgroundColor: MaterialStatePropertyAll(Theme.of(context).primaryColor)
+                      backgroundColor: MaterialStatePropertyAll(Theme
+                          .of(context)
+                          .primaryColor)
                   ),
-                  onPressed: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (e)=> CarInfoScreen()));
+                  onPressed: () {
+                    if (carColorController.text.isNotEmpty &&
+                        carNumberController.text.isNotEmpty &&
+                        carModelController.text.isNotEmpty && selectedCarType != null
+                    ) {
+                      saveCarInfo();
+                    }
+
+                    //Navigator.push(context, MaterialPageRoute(builder: (e)=> CarInfoScreen()));
                   },
                   child: const Text('Save Now',
                     style: TextStyle(
                         color: Colors.white
-                    ) ,)),
+                    ),)),
             ],
           ),
         ),
